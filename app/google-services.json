@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "889009646228",
+    "firebase_url": "https://lyght-reader.firebaseio.com",
+    "project_id": "lyght-reader",
+    "storage_bucket": "lyght-reader.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:889009646228:android:bce7ee8862e95dc1",
+        "android_client_info": {
+          "package_name": "com.tech.ssylix.lyghtreader"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "889009646228-0a20i30cbsph6cu2vtebkdr8tfnk5ci0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tech.ssylix.lyghtreader",
+            "certificate_hash": "46497e4bc25f15f3e85eaac22d7c1b106a972239"
+          }
+        },
+        {
+          "client_id": "889009646228-6q2u47n9ll0audv6hdgus6r45bu82cka.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHGnZrUVc4OZDrZ4Q9lBfteZ0mNoh0f0o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "889009646228-6q2u47n9ll0audv6hdgus6r45bu82cka.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

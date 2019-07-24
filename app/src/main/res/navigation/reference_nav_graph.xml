@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/reference_nav_graph"
+    app:startDestination="@id/showReferencesFragment">
+
+    <fragment
+        android:id="@+id/showReferencesFragment"
+        android:name="com.tech.ssylix.lyght_reader.logic.nativeApis.fragments.ReferencesFragment"
+        android:label="fragment_show_references"
+        tools:layout="@layout/fragment_references" >
+        <action
+            android:id="@+id/action_showReferencesFragment_to_newVideoReference"
+            app:destination="@id/newVideoReference" />
+        <action
+            android:id="@+id/action_showReferencesFragment_to_newImageReference"
+            app:destination="@id/newImageReference" />
+        <action
+            android:id="@+id/action_showReferencesFragment_to_newAudioReference"
+            app:destination="@id/newAudioReference" />
+        <action
+            android:id="@+id/action_showReferencesFragment_to_newTextReference"
+            app:destination="@id/newTextReference" />
+    </fragment>
+    <fragment
+        android:id="@+id/newVideoReference"
+        android:name="com.tech.ssylix.lyght_reader.logic.nativeApis.fragments.NewVideoReference"
+        android:label="fragment_new_video_reference"
+        tools:layout="@layout/page_new_video_reference" />
+    <fragment
+        android:id="@+id/newImageReference"
+        android:name="com.tech.ssylix.lyght_reader.logic.nativeApis.fragments.NewImageReference"
+        android:label="fragment_new_image_reference"
+        tools:layout="@layout/page_new_image_reference" />
+    <fragment
+        android:id="@+id/newAudioReference"
+        android:name="com.tech.ssylix.lyght_reader.logic.nativeApis.fragments.NewPhotoReference"
+        android:label="fragment_new_photo_reference"
+        tools:layout="@layout/page_show_reference" />
+    <fragment
+        android:id="@+id/newTextReference"
+        android:name="com.tech.ssylix.lyght_reader.logic.nativeApis.fragments.NewTextReference"
+        android:label="fragment_new_text_reference"
+        tools:layout="@layout/page_new_web_reference" />
+</navigation>

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/search_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/shape_c64_l3"
+        android:hint="Search"
+        android:inputType="textPersonName"
+        android:maxLines="5"
+        android:padding="10dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toStartOf="@+id/search_icon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/search_icon"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="4dp"
+        android:background="@drawable/shape_oval_white_alpha"
+        android:backgroundTint="@color/iconBlueBack"
+        app:layout_constraintBottom_toBottomOf="@+id/search_text"
+        app:layout_constraintDimensionRatio="1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/search_text"
+        app:srcCompat="@drawable/ic_search" />
+
+    <Button
+        android:id="@+id/add_new_interpret"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:text="Add new"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/search_text"
+        tools:visibility="visible" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/interpret_recycler"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/close_interpretation"
+        android:layoutAnimation="@anim/recycler_layout_animation_2"/>
+
+    <ProgressBar
+        android:id="@+id/interpret_load_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/search_text" />
+
+    <EditText
+        android:id="@+id/interpretation_text"
+        android:layout_width="0dp"
+        android:layout_height="120dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/shape_c16_l3"
+        android:ems="10"
+        android:gravity="top"
+        android:hint="Type your interpretation here"
+        android:inputType="textPersonName"
+        android:padding="10dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:textSize="14sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/add_new_interpret"
+        tools:visibility="visible" />
+
+    <RadioButton
+        android:id="@+id/position_marker"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="Marker unset"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/add_new_interpret"
+        app:layout_constraintEnd_toStartOf="@+id/add_new_interpret"
+        app:layout_constraintStart_toEndOf="@+id/marker_tag_icon"
+        app:layout_constraintTop_toTopOf="@+id/add_new_interpret"
+        tools:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/marker_tag_icon"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/position_marker"
+        app:layout_constraintDimensionRatio="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/position_marker"
+        app:srcCompat="@drawable/ic_tag"
+        tools:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/close_interpretation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/shape_oval_white_alpha"
+        android:backgroundTint="@color/whiteBack"
+        android:padding="16dp"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/save_interpretation"
+        app:layout_constraintTop_toBottomOf="@+id/interpretation_text"
+        app:srcCompat="@drawable/ic_close"
+        tools:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/save_interpretation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/shape_oval_white_alpha"
+        android:backgroundTint="@color/whiteBack"
+        android:padding="12dp"
+        android:visibility="gone"
+        app:layout_constraintHorizontal_bias="0.421"
+        app:layout_constraintLeft_toRightOf="@+id/close_interpretation"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/interpretation_text"
+        app:srcCompat="@drawable/ic_check"
+        tools:visibility="visible" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

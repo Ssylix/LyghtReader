@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">Lyght Reader</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_reader_page">ReaderPage</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_tools">Tools</string>
+    <string name="menu_share">Share</string>
+    <string name="menu_send">Send</string>
+    <string name="dummy_text_long">Waking up, he found himself a shackled slave being freshly delivered to a slave camp, one of many owned by queen Aramiri, born of thunder, daughter of the gods and queen of RuunKai.</string>
+    <string name="dummy_text_extra_long">Absences: A staff member is out of town another has a child sick in the hospital. The management decided that we move into where consult is moving out of. Consult is moving to cooperative building. The SGBN has been occupied by consult. Two offices will be available where Chisom and Ena are occupying right now. The office currently contained a scanner and a shelf so the key had to be returned to enable them to move left property, the principal was also informed. Madam Isichei observed that there was no document from DOS. Dr. Adegbite had to resend the mail to one of the meeting participants. There was also nothing from SDA. Dr. Adegbite pointed out that it was important to key into the format. Dr. said we have to push it out to all the team members so that they can study the format and start to present their data in the new format. All details are available in the attachments that were sent over prior to the beginning of the meeting via mail. Mrs. Isichei said the document should e sent back for further revision by the preparers and reviewers. A participant proposed that the process can be made easier by getting the department to get a generic template for each directorate and then addendums for those aspects that require peculiar treatment. Some these are Result, Admission office, and DD registrar Academic. A participant spoke on the importance of implementing. Dr. elaborated by saying that the external auditor can be invited when we are done implementing successfully. A participant said there should be evidence of compliance to the procedure, such as document signed and presentable to an external auditor. Operating environment of the departments that are unique to them should be the only areas that they take a decision on their peculiar format. A participant said that we can have a committee to revise the procedures to prevent a repetition of registered procedures across departments. Safety in a lab is different from general safety. A participant asked we have a dedicated safety unit to be assigned the task of inspecting safety procedures for the institute. A participant also said that it is difficult to be recognized for your work in the institute. Dr. stated that he has had to make multiple application for printers and copiers. Soft and hard copies ought to be kept in a dedicated space. Dr. gave a brief explanation about the office hunt history stating that the PMBS office was donated by the HOD in his goodwill. Dr. stated that it should be the case that as soon as one is ready he should share his result with the next person who will use his work to harmonize his own work. So that the general result can be harmonized. Using a general template before addressing peculiarities. Meeting Adjournment: Thursday 12pm to 1pm (Breaktime).</string>
+    <string name="action_hierarchy">Hierarchy</string>
+    <string name="action_reference">Reference</string>
+    <string name="action_interpretation">Interpretation</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="action_night">Dark mode (Power saver)</string>
+    <string name="marker_set">Marker set</string>
+    <string name="marker_unset">Marker unset</string>
+    <string name="empty_list_text">Nothing here yet! Try searching</string>
+    <string name="dummy_text">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</string>
+    <string name="error_file_text">Sorry, this file is either broken or currently unsupported by the system</string>
+    <string name="dummy_url_text">https://ssylix.tech/lyghtreader/</string>
+</resources>

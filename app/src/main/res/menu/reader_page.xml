@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_night"
+        android:orderInCategory="97"
+        android:title="@string/action_night"
+        android:checkable="true"
+        android:checked="true"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/action_interpretation"
+        android:title="@string/action_interpretation"
+        android:orderInCategory="99"
+        android:icon="@drawable/ic_interpretation"
+        app:showAsAction="always"/>
+
+    <item android:id="@+id/action_reference"
+        android:title="@string/action_reference"
+        android:orderInCategory="98"
+        android:icon="@drawable/ic_references"
+        app:showAsAction="always"/>
+
+    <item android:id="@+id/action_summary_outline"
+        android:title="@string/action_hierarchy"
+        android:orderInCategory="97"
+        android:icon="@drawable/ic_hierarchy"
+        app:showAsAction="always"/>
+</menu>
