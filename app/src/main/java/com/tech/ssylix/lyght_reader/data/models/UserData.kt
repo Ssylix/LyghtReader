@@ -1,9 +1,11 @@
 package com.tech.ssylix.lyght_reader.data.models
 
+import androidx.annotation.Keep
 import com.google.firebase.database.*
 import com.tech.ssylix.lyght_reader.logic.utitlities.debugLog
 import com.tech.ssylix.lyght_reader.logic.viewmodels.HomeViewModel
 
+@Keep
 data class UserData(
     var name: Names? = null,
     var email: String? = null,

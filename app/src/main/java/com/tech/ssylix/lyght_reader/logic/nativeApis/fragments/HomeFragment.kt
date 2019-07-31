@@ -206,6 +206,27 @@ class HomeFragment : Fragment(), UX, OnContinueItemListener, OnParamsInitialized
 
     override fun onResume() {
         super.onResume()
+        try {
+            if(mViewModel.getRecommendationList().isNotEmpty() && view?.recommended_list?.adapter != null) {
+                (view?.recommended_list?.adapter as DocumentRecyclerAdapter).list.apply {
+                    clear()
+                    addAll(mViewModel.getRecommendationList())
+                }
+                (view?.recommended_list?.adapter as DocumentRecyclerAdapter).notifyDataSetChanged()
+                view?.firebase_load_progress?.visibility = View.GONE
+            }
+
+            if(mViewModel.getContinueList().isNotEmpty() && view?.continue_list?.adapter != null) {
+                (view?.continue_list?.adapter as DocumentRecyclerAdapter).list.apply {
+                    clear()
+                    addAll(mViewModel.getContinueList())
+                }
+                (view?.continue_list?.adapter as DocumentRecyclerAdapter).notifyDataSetChanged()
+                view?.firebase_load_progress?.visibility = View.GONE
+            }
+        }catch (u : UninitializedPropertyAccessException){
+            u.printStackTrace()
+        }
     }
 
     override fun onCreateView(

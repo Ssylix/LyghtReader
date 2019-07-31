@@ -20,9 +20,7 @@ import com.github.barteksc.pdfviewer.util.FitPolicy
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.tech.ssylix.lyght_reader.R
-import com.tech.ssylix.lyght_reader.logic.utitlities.Storage
 import com.tech.ssylix.lyght_reader.data.models.*
-import com.tech.ssylix.lyght_reader.logic.utitlities.debugLog
 import com.tech.ssylix.lyght_reader.logic.nativeApis.activities.NewUpload.Companion.REQ_DOC
 import com.tech.ssylix.lyght_reader.logic.nativeApis.fragments.*
 import com.tech.ssylix.lyght_reader.logic.utitlities.copyInputStreamToFile
@@ -37,7 +35,6 @@ import kotlinx.android.synthetic.main.model_interpret_recycler.view.*
 import kotlinx.android.synthetic.main.model_summary_recycler.view.*
 import kotlinx.android.synthetic.main.page_drawer_interpret.*
 import kotlinx.android.synthetic.main.page_drawer_summary_outline.*
-import kotlinx.android.synthetic.main.page_show_reference.view.*
 import java.io.File
 
 
@@ -48,7 +45,6 @@ class ReaderPage : AppCompatActivity(),
     OnOutlineLoadListener, OnReferenceLoadListener {
 
     private var mNewMarkerPosition: Int? = null
-    private lateinit var mStore: Storage
     private lateinit var mShare : SharedPreferences
     private lateinit var mBook: File
     private var mRootViewSize: Int = 0
@@ -85,7 +81,7 @@ class ReaderPage : AppCompatActivity(),
                     mBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
                 }
 
-                when (newState){
+                /*when (newState){
                     BottomSheetBehavior.STATE_HIDDEN -> "State Hidden".debugLog()
 
                     BottomSheetBehavior.STATE_EXPANDED -> "State Expanded".debugLog()
@@ -99,11 +95,11 @@ class ReaderPage : AppCompatActivity(),
                     BottomSheetBehavior.STATE_SETTLING -> "State Settling".debugLog()
 
                     else -> "State Other".debugLog()
-                }
+                }*/
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                "Slide".debugLog()
+                //"Slide".debugLog()
             }
         })
 
@@ -151,13 +147,15 @@ class ReaderPage : AppCompatActivity(),
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                     val newArray: ArrayList<Pair<Int, Interpretation>> = ArrayList()
 
-                    searchForSimilar(newArray, s.toString())
-
-                    if (newArray.isNotEmpty()) {
-                        interpret_recycler.adapter = InterpretationRecycler(newArray)
-                    } else {
-                        setupUiToAddNewInterpretation(s.toString())
+                    searchForSimilar(newArray, s.toString()){ array ->
+                        if (array.isNotEmpty()) {
+                            interpret_recycler.adapter = InterpretationRecycler(array)
+                        } else {
+                            setupUiToAddNewInterpretation(s.toString())
+                        }
                     }
+
+
                 }
 
             }
@@ -276,6 +274,11 @@ class ReaderPage : AppCompatActivity(),
         if(mViewModel.mBookLoaded){
             onBookSuccessfullyLoaded(mViewModel.getBook(mDocTitle), mViewModel.mCurrentPageNumber)
         }
+
+        if(!mShare.getBoolean(HomePage.sTutoredkey, false)){
+            TutorialFragment().newInstance(TutorialFragment.READER_PAGE).show(supportFragmentManager, "showHomeTutorial")
+            mShare.edit().putBoolean(HomePage.sTutoredkey, true).apply()
+        }
     }
 
     private fun setupUiToAddNewInterpretation(searchText: String) {
@@ -370,7 +373,11 @@ class ReaderPage : AppCompatActivity(),
         save_summary.visibility = View.GONE
     }
 
-    private fun searchForSimilar(newArray: ArrayList<Pair<Int, Interpretation>>, searchText: String) {
+    private fun searchForSimilar(
+        newArray: ArrayList<Pair<Int, Interpretation>>,
+        searchText: String,
+        action: (ArrayList<Pair<Int, Interpretation>>) -> Unit
+    ) {
         interpretationList.forEach {
             if (it.second.capText.contains(searchText) || searchText.contains(it.second.capText) ||
                 it.second.subText.contains(searchText) || searchText.contains(it.second.subText)
@@ -378,13 +385,15 @@ class ReaderPage : AppCompatActivity(),
                 newArray.add(it)
             }
         }
+        action.invoke(newArray)
     }
 
     private fun searchForSimilarOnline(
         newArray: ArrayList<Pair<Int, Interpretation>>,
         searchText: String
     ) {
-
+        newArray.size
+        searchText.length
     }
 
     private fun getIntentDetails() {
@@ -425,27 +434,10 @@ class ReaderPage : AppCompatActivity(),
         }
     }
 
-    inner class InterpretationRecycler(private var newArray: List<Pair<Int, Interpretation>>? =
+    inner class InterpretationRecycler(private var interpretationArray: List<Pair<Int, Interpretation>>? =
                                            mViewModel.getPageInterpretations(pdfViewer.currentPage)) :
         RecyclerView.Adapter<InterpretationRecycler.MyViewHolder>() {
         private val mDefaultEmpty = 1001
-
-        init {
-            if (newArray == null) {
-                newArray = ArrayList()
-                try {
-                    val page = pdfViewer.currentPage
-                    interpretationList.forEach {
-                        if (it.first == page) {
-                            (newArray as ArrayList<Pair<Int, Interpretation>>).add(it)
-                        }
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-
-            }
-        }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
             return when (viewType) {
@@ -460,24 +452,24 @@ class ReaderPage : AppCompatActivity(),
         }
 
         override fun getItemCount(): Int {
-            return newArray?.size ?: 1
+            return if((interpretationArray?.size ?: 0) > 0) (interpretationArray?.size ?: 0) else 1
         }
 
         override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-            if ((newArray?.size ?: 0) >= 1) {
-                holder.itemView.cap_text.text = newArray?.get(position)?.second?.capText
-                holder.itemView.interpret_text.text = newArray?.get(position)?.second?.subText
+            if ((interpretationArray?.size ?: 0) >= 1) {
+                holder.itemView.cap_text.text = interpretationArray?.get(position)?.second?.capText
+                holder.itemView.interpret_text.text = interpretationArray?.get(position)?.second?.subText
             } else {
                 holder.itemView.empty_list_text.text = getString(R.string.empty_list_text)
             }
 
-            if(newArray?.get(position)?.second?.subInterpretations?.isEmpty() != false){
+            if(interpretationArray?.get(position)?.second?.subInterpretations?.isEmpty() != false){
                 holder.itemView.more_interpretations.visibility = View.GONE
             }
         }
 
         override fun getItemViewType(position: Int): Int {
-            return if ((newArray?.size ?: 0) < 1) {
+            return if ((interpretationArray?.size ?: 0) < 1) {
                 mDefaultEmpty
             } else {
                 -1
@@ -583,7 +575,7 @@ class ReaderPage : AppCompatActivity(),
 
     override fun onSaveNewInterpretation(interpretation: Interpretation) {
         mViewModel.mDatabaseReference
-            .child(mStore.INTERPRETN.invoke(intent.getStringExtra(HomeFragment.DOC_KEY), pdfViewer.currentPage))
+            .child(mViewModel.mStoreUtils.INTERPRETN.invoke(intent.getStringExtra(HomeFragment.DOC_KEY), pdfViewer.currentPage))
             .push().setValue(interpretation).addOnSuccessListener {
                 interpret_recycler.adapter = InterpretationRecycler()
                 toast("Saved")
@@ -596,7 +588,7 @@ class ReaderPage : AppCompatActivity(),
 
     override fun onSaveNewReference(reference: Reference) {
         mViewModel.mDatabaseReference.child(
-            mStore.REFERENCE.invoke(
+            mViewModel.mStoreUtils.REFERENCE.invoke(
                 intent.getStringExtra(HomeFragment.DOC_KEY),
                 pdfViewer.currentPage
             )
@@ -608,7 +600,7 @@ class ReaderPage : AppCompatActivity(),
 
     override fun onSaveNewOutline(summary: Summary) {
         mViewModel.mDatabaseReference.child(
-            mStore.SUMMARY_OUTLINE.invoke(
+            mViewModel.mStoreUtils.SUMMARY_OUTLINE.invoke(
                 intent.getStringExtra(HomeFragment.DOC_KEY),
                 pdfViewer.currentPage
             )
@@ -632,7 +624,8 @@ class ReaderPage : AppCompatActivity(),
     override fun onBookLoadProgress(percentageLoad : Int) {
         file_download_progress.isIndeterminate = false
         file_download_progress.max = 100
-        file_download_progress.progress = percentageLoad
+
+        file_download_progress.setProgress(percentageLoad, true)
     }
 
     override fun onReferenceFragmentInit(fragment: ReferencesFragment) {

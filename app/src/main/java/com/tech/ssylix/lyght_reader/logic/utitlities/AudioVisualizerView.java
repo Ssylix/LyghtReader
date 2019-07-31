@@ -56,10 +56,10 @@ public class AudioVisualizerView extends View {
 
         playedStatePainting.setStrokeWidth(1f);
         playedStatePainting.setAntiAlias(true);
-        playedStatePainting.setColor(ContextCompat.getColor(getContext(), R.color.gray));
+        playedStatePainting.setColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
         notPlayedStatePainting.setStrokeWidth(1f);
         notPlayedStatePainting.setAntiAlias(true);
-        notPlayedStatePainting.setColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+        notPlayedStatePainting.setColor(ContextCompat.getColor(getContext(), R.color.gray));
     }
 
     /**

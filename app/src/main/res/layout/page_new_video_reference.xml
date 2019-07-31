@@ -14,13 +14,15 @@
         android:layout_marginTop="48dp"
         android:layout_marginEnd="8dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/imageView10"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintStart_toEndOf="@+id/video_reference_thumbnail"
+        app:layout_constraintTop_toTopOf="parent"
+        android:maxLines="1">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/video_reference_link"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:maxLines="1"
             android:hint="Paste video link here" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -31,14 +33,16 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
+        android:maxLines="1"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/imageView10"
+        app:layout_constraintStart_toEndOf="@+id/video_reference_thumbnail"
         app:layout_constraintTop_toBottomOf="@+id/video_reference_layout">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/video_title_text"
+            android:id="@+id/video_reference_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:maxLines="1"
             android:hint="Title" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -55,7 +59,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout2" />
 
     <ImageView
-        android:id="@+id/imageView10"
+        android:id="@+id/video_reference_thumbnail"
         android:layout_width="140dp"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
@@ -66,5 +70,6 @@
         android:padding="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/video_reference_layout"
-        app:srcCompat="@android:drawable/ic_media_play" />
+        app:srcCompat="@android:drawable/ic_media_play"
+         />
 </androidx.constraintlayout.widget.ConstraintLayout>

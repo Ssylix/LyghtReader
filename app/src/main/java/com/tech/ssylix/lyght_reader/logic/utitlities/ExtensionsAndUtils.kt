@@ -202,24 +202,21 @@ fun File.getPdfPageBitmap(scaleDownFactor: Float = 5f, pageNumber: Int = 0): Bit
 fun getFileName(context: Context, uri: Uri): String? {
     var result: String? = null
     if (uri.scheme == "content") {
-        val cursor = context.contentResolver.query(uri, null, null, null, null)
-        try {
-            if (cursor != null && cursor.moveToFirst()) {
-                result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+        context.contentResolver.query(uri, null, null, null, null).use {
+            if (it != null && it.moveToFirst()) {
+                result = it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
             }
-        } finally {
-            cursor!!.close()
         }
     }
     if (result == null) {
         result = uri.path
         val cut = result!!.lastIndexOf('/')
         if (cut != -1) {
-            result = result.substring(cut + 1)
+            result = result?.substring(cut + 1)
         }
     }
 
-    return result.substringBeforeLast(".")
+    return result!!.substringBeforeLast(".")
 }
 
 @Throws(IOException::class)

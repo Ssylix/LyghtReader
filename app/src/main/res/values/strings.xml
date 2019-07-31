@@ -29,4 +29,5 @@
     <string name="dummy_text">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</string>
     <string name="error_file_text">Sorry, this file is either broken or currently unsupported by the system</string>
     <string name="dummy_url_text">https://ssylix.tech/lyghtreader/</string>
+    <string name="more">More</string>
 </resources>

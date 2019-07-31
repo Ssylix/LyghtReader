@@ -130,6 +130,7 @@ class Storage(val uid : String) {
     ) {
         val upload = newUpload.view?.upload_progress
         upload?.isIndeterminate = false
+        var mMinVal = 0.toLong()
         newUpload.mViewModel.mStorageReference.child(newUpload.mViewModel.mStoreUtils.DOCS).child(newUpload.view?.reference_title_text?.text.toString())
             .putFile(uri).addOnSuccessListener { snapshot ->
                 val meta = Metadata()
@@ -139,12 +140,31 @@ class Storage(val uid : String) {
                     meta.downloadUrl = Uri.toString()
                     newUpload.mViewModel.mStoreUtils.uploadThumb(newUpload, bitmap, meta, snapshot, button, uri, action)
                 }
-            }.addOnProgressListener {
-                upload?.progress = ((upload?.max ?: 0) * (it.bytesTransferred/it.totalByteCount)).toInt()
+            }.addOnProgressListener { task ->
+                if (mMinVal > task.bytesTransferred.debugLog() && task.bytesTransferred != 0.toLong()) {
+                    mMinVal = task.bytesTransferred
+                }
+
+                if (task.totalByteCount <= mMinVal) {
+                    val tT = (task.totalByteCount - mMinVal) / 100
+                    Thread {
+                        Thread.sleep(500)
+                        val pG = (task.totalByteCount - task.bytesTransferred) / tT
+                        upload?.isIndeterminate = false
+                        upload?.max = 100
+                        upload?.progress = 100 - pG.toInt()
+                    }
+                } else {
+                    val tT = (task.totalByteCount - mMinVal) / 100
+                    val pG = (task.totalByteCount - task.bytesTransferred) / tT
+                    upload?.isIndeterminate = false
+                    upload?.max = 100
+                    upload?.progress = 100 - pG.toInt()
+                }
             }
     }
 
     companion object {
-        const val APP_TYPE = "Beta-v1"
+        const val APP_TYPE = "Beta-v2"
     }
 }

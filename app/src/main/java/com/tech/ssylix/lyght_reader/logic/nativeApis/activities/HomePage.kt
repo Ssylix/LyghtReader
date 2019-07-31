@@ -1,9 +1,14 @@
 package com.tech.ssylix.lyght_reader.logic.nativeApis.activities
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import androidx.core.view.isVisible
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.Navigation
 import androidx.navigation.findNavController
@@ -11,6 +16,7 @@ import com.tech.ssylix.lyght_reader.R
 import com.tech.ssylix.lyght_reader.data.models.Document
 import com.tech.ssylix.lyght_reader.data.models.UserData
 import com.tech.ssylix.lyght_reader.logic.nativeApis.fragments.HomeFragment
+import com.tech.ssylix.lyght_reader.logic.nativeApis.fragments.TutorialFragment
 import com.tech.ssylix.lyght_reader.logic.viewmodels.HomeViewModel
 import com.tech.ssylix.lyght_reader.logic.viewmodels.HomeViewModel.*
 import kotlinx.android.synthetic.main.activity_home.*
@@ -26,6 +32,7 @@ class HomePage : AppCompatActivity(), OnParamsInitialized, HomeFragment.OnInitia
     }
 
     lateinit var mHomeFragment: HomeFragment
+    lateinit var mShare : SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,19 +40,36 @@ class HomePage : AppCompatActivity(), OnParamsInitialized, HomeFragment.OnInitia
         setSupportActionBar(toolbar)
         
         mViewModel.initializeFireBase(this)
+        mShare = getSharedPreferences(sSharedStoreKey, Context.MODE_PRIVATE)
 
         Navigation.setViewNavController(fab, findNavController(R.id.fragment))
         fab.setOnClickListener(Navigation.createNavigateOnClickListener(R.id.action_homeFragment_to_newUpload))
-        findNavController(R.id.fragment).addOnDestinationChangedListener { controller, destination, arguments ->
+        val toggleVisibility = { view : View , forceVisible : Boolean->
+            if(!forceVisible) {
+                view.isVisible = !view.isVisible
+            }else{
+                view.visibility = View.VISIBLE
+            }
+        }
+        findNavController(R.id.fragment).addOnDestinationChangedListener { _, destination, _ ->
             when(destination.id){
                 R.id.newUpload -> {
-                    fab.isEnabled = false
+                    toggleVisibility.invoke(fab, false)
                 }
 
                 else -> {
-                    fab.isEnabled = true
+                    toggleVisibility.invoke(fab, true)
                 }
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if(!mShare.getBoolean(sTutoredkey, false)){
+            TutorialFragment().newInstance(TutorialFragment.HOME_TUTORIAL).show(supportFragmentManager, "showHomeTutorial")
+            mShare.edit().putBoolean(sTutoredkey, true).apply()
         }
     }
 
@@ -99,6 +123,11 @@ class HomePage : AppCompatActivity(), OnParamsInitialized, HomeFragment.OnInitia
 
     override fun onRecommendationsLoaded(document: Document) {
         mHomeFragment.onRecommendationsLoaded(document)
+    }
+
+    companion object {
+        const val sSharedStoreKey = "ReaderSharedPreferences"
+        const val sTutoredkey = "ShowTutorial"
     }
 }
 

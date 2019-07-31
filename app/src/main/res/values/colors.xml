@@ -3,9 +3,10 @@
     <color name="colorPrimary">#202020</color>
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#64B5F6</color>
-    <color name="backgroundPrimary">#99000000</color>
+    <color name="backgroundPrimary">#75000000</color>
     <color name="interpretationBack">#3381C784</color>
     <color name="outlineBack">#1EFFFFFF</color>
     <color name="whiteBack">#68FFFFFF</color>
     <color name="iconBlueBack">#2D64B5F6</color>
+    <color name="gray">#575757</color>
 </resources>

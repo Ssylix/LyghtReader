@@ -10,9 +10,8 @@ import com.google.firebase.storage.StorageReference
 import com.tech.ssylix.lyght_reader.data.models.Interpretation
 import com.tech.ssylix.lyght_reader.data.models.Reference
 import com.tech.ssylix.lyght_reader.data.models.Summary
-import com.tech.ssylix.lyght_reader.data.models.Type
 import com.tech.ssylix.lyght_reader.logic.utitlities.Storage
-import com.tech.ssylix.lyght_reader.logic.utitlities.debugLog
+import com.tech.ssylix.lyght_reader.logic.utitlities.helpers.ReferenceOnlineHelper
 import java.io.File
 import java.lang.Thread.sleep
 
@@ -29,6 +28,8 @@ class ReaderViewModel(application: Application) : AndroidViewModel(application) 
     lateinit var mOutlineLoadListener: OnOutlineLoadListener
     lateinit var mReferenceLoadListener: OnReferenceLoadListener
 
+    val mReferenceOnlineHelper : ReferenceOnlineHelper
+
 
     val mStoreUtils by lazy {
         Storage(mFirebaseAuth.uid!!)
@@ -37,6 +38,8 @@ class ReaderViewModel(application: Application) : AndroidViewModel(application) 
     init {
         mDatabaseReference = mFirebaseDatabase.reference
         mStorageReference = mFirebaseStorage.reference
+
+        mReferenceOnlineHelper = ReferenceOnlineHelper()
     }
 
     lateinit var mBookName : String
@@ -211,16 +214,7 @@ class ReaderViewModel(application: Application) : AndroidViewModel(application) 
             override fun onChildChanged(p0: DataSnapshot, p1: String?) {}
 
             override fun onChildAdded(p0: DataSnapshot, p1: String?) {
-                val reference = p0.getValue(Reference::class.java)
-                reference?.mPageId = pageId
-                reference?.mDocId = mBookId
-                if(reference != null) {
-                    val curiousPair = Pair(pageId, reference)
-                    if(!mReferenceList.contains(curiousPair)){
-                        mReferenceList.add(curiousPair)
-                        mReferenceLoadListener.onPageReferencesChanged()
-                    }
-                }
+                mReferenceOnlineHelper.addLoadedReferenceToReferenceList(p0, mReferenceList, mReferenceLoadListener, pageId, mBookId)
             }
 
             override fun onChildRemoved(p0: DataSnapshot) {}
@@ -230,14 +224,12 @@ class ReaderViewModel(application: Application) : AndroidViewModel(application) 
 
     fun getPageReferences(pageId: Int): List<Pair<Int, Reference>> {
 
-        return ArrayList<Pair<Int, Reference>>().also { dummy_array ->
+        /*ArrayList<Pair<Int, Reference>>().also { dummy_array ->
             arrayOf(Type.MP4, Type.URL, Type.MP3, Type.JPG, Type.OTHER).forEach {
                 dummy_array.add(Pair(pageId, Reference().apply { this.type = it }))
             }
-        }
-        mReferenceList.filter {
-            it.first == pageId
-        }
+        }*/
+        return mReferenceOnlineHelper.getReferenceListFilteredByPage(mReferenceList, pageId)
     }
 
     interface OnBookLoaded{

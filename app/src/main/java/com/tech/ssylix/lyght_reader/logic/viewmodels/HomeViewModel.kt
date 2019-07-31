@@ -72,12 +72,16 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         return mUserData
     }
 
-    fun getContinueList() {
-
+    fun getContinueList(): ArrayList<Document> {
+        return mUserData.contentInfo?.viewed?.docs ?: ArrayList()
     }
 
     override fun onCleared() {
         super.onCleared()
+    }
+
+    fun getRecommendationList(): ArrayList<Document> {
+        return mRecommendedList
     }
 
     interface UX {

@@ -12,18 +12,10 @@
         tools:layout="@layout/fragment_home" >
         <action
             android:id="@+id/action_begin_signup"
-            app:destination="@id/signUpFragment"
-            app:enterAnim="@anim/action_mode_enter"
-            app:exitAnim="@anim/action_mode_exit"
-            app:popEnterAnim="@anim/controls_annotation_property_popup_show"
-            app:popExitAnim="@anim/controls_annotation_property_popup_hide" />
+            app:destination="@id/signUpFragment" />
         <action
             android:id="@+id/action_homeFragment_to_newUpload"
-            app:destination="@id/newUpload"
-            app:enterAnim="@anim/action_mode_enter"
-            app:exitAnim="@anim/action_mode_exit"
-            app:popEnterAnim="@anim/controls_annotation_property_popup_show"
-            app:popExitAnim="@anim/controls_annotation_property_popup_hide" />
+            app:destination="@id/newUpload" />
     </fragment>
 
     <fragment

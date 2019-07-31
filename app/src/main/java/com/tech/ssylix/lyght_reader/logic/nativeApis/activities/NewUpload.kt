@@ -4,6 +4,7 @@ package com.tech.ssylix.lyght_reader.logic.nativeApis.activities
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.pdf.PdfRenderer
 import android.net.Uri
@@ -19,6 +20,7 @@ import kotlinx.android.synthetic.main.fragment_new_upload.view.*
 import androidx.loader.content.CursorLoader
 import com.tech.ssylix.lyght_reader.*
 import com.tech.ssylix.lyght_reader.data.models.Type
+import com.tech.ssylix.lyght_reader.logic.nativeApis.fragments.TutorialFragment
 import com.tech.ssylix.lyght_reader.logic.utitlities.*
 import com.tech.ssylix.lyght_reader.logic.viewmodels.HomeViewModel
 import com.tech.ssylix.lyght_reader.logic.viewmodels.NewContentViewModel
@@ -38,9 +40,12 @@ import java.io.InputStream
 class NewUpload : Fragment() {
 
     lateinit var  mViewModel: NewContentViewModel
+    lateinit var mShare : SharedPreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        mShare = activity!!.getSharedPreferences(NewUpload.sSharedStoreKey, Context.MODE_PRIVATE)
         mViewModel = ViewModelProviders.of(this)[NewContentViewModel::class.java]
     }
 
@@ -49,6 +54,14 @@ class NewUpload : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_new_upload, container, false)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if(!mShare.getBoolean(HomePage.sTutoredkey, false)){
+            TutorialFragment().newInstance(TutorialFragment.NEW_CONTENT).show(activity!!.supportFragmentManager, "showHomeTutorial")
+            mShare.edit().putBoolean(HomePage.sTutoredkey, true).apply()
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -181,5 +194,6 @@ class NewUpload : Fragment() {
         const val REQ_VID = 1001
         const val REQ_AUD = 1110
         const val ARG_PARAM2 = "param2"
+        const val sSharedStoreKey: String = "NewUploadSharedPreferences"
     }
 }

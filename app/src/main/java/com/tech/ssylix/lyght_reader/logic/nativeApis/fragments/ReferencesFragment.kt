@@ -4,35 +4,40 @@ import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import androidx.core.view.isNotEmpty
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import android.widget.MediaController
 import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.rubensousa.gravitysnaphelper.GravitySnapHelper
 import com.tech.ssylix.lyght_reader.R
 import com.tech.ssylix.lyght_reader.data.models.Reference
 import com.tech.ssylix.lyght_reader.data.models.Type
 import com.tech.ssylix.lyght_reader.logic.nativeApis.activities.NewUpload.Companion.REQ_IMG
-import com.tech.ssylix.lyght_reader.logic.utitlities.animateClicks
-import com.tech.ssylix.lyght_reader.logic.utitlities.animateClicksRotation
-import com.tech.ssylix.lyght_reader.logic.utitlities.debugLog
-import com.tech.ssylix.lyght_reader.logic.utitlities.generateRandomKey
+import com.tech.ssylix.lyght_reader.logic.utitlities.*
+import com.tech.ssylix.lyght_reader.logic.utitlities.helpers.ReferenceOnlineHelper
+import com.tech.ssylix.lyght_reader.logic.utitlities.helpers.ReferenceUiHelper
 import com.tech.ssylix.lyght_reader.logic.viewmodels.ReaderViewModel
 import kotlinx.android.synthetic.main.fragment_references.view.*
+import kotlinx.android.synthetic.main.model_image_reference.view.*
+import kotlinx.android.synthetic.main.model_video_reference.*
+import kotlinx.android.synthetic.main.model_video_reference.view.*
+import kotlinx.android.synthetic.main.model_web_reference.view.*
 import kotlinx.android.synthetic.main.page_new_audio_reference.view.*
 import kotlinx.android.synthetic.main.page_new_image_reference.view.*
-import kotlinx.android.synthetic.main.page_new_video_reference.*
 import kotlinx.android.synthetic.main.page_new_web_reference.view.*
 import kotlinx.android.synthetic.main.page_new_video_reference.view.*
 import kotlinx.android.synthetic.main.page_show_reference.view.*
+import java.lang.Thread.sleep
 
 class ReferencesFragment : Fragment(), ReaderViewModel.OnReferenceLoadListener {
 
@@ -41,10 +46,13 @@ class ReferencesFragment : Fragment(), ReaderViewModel.OnReferenceLoadListener {
     private lateinit var mViewModel: ReaderViewModel
 
     lateinit var mShowReferencePage: View
-    private lateinit var mNewWebReferencePage: View
-    private lateinit var mNewVideoReferencePage: View
-    private lateinit var mNewAudioReferencePage: View
-    private lateinit var mNewImageReferencePage: View
+    lateinit var mNewWebReferencePage: View
+    lateinit var mNewVideoReferencePage: View
+    lateinit var mNewAudioReferencePage: View
+    lateinit var mNewImageReferencePage: View
+
+    val mReferenceOnlineHelper : ReferenceOnlineHelper = ReferenceOnlineHelper()
+    val mReferenceUiHelper : ReferenceUiHelper = ReferenceUiHelper(this)
 
     override fun onAttachFragment(childFragment: Fragment) {
         super.onAttachFragment(childFragment)
@@ -60,74 +68,32 @@ class ReferencesFragment : Fragment(), ReaderViewModel.OnReferenceLoadListener {
     override fun onViewCreated(rootView: View, savedInstanceState: Bundle?) {
         super.onViewCreated(rootView, savedInstanceState)
 
-        mShowReferencePage = View.inflate(context!!, R.layout.page_show_reference, FrameLayout(context!!))
-        mNewWebReferencePage = View.inflate(context!!, R.layout.page_new_web_reference, FrameLayout(context!!))
-        mNewImageReferencePage = View.inflate(context!!, R.layout.page_new_image_reference, FrameLayout(context!!))
-        mNewVideoReferencePage = View.inflate(context!!, R.layout.page_new_video_reference, FrameLayout(context!!))
-        mNewAudioReferencePage = View.inflate(context!!, R.layout.page_new_audio_reference, FrameLayout(context!!))
+        mReferenceUiHelper.getPages()
 
-        rootView.page_layout.addView(mShowReferencePage)
-        rootView.page_layout.addView(mNewWebReferencePage)
-        rootView.page_layout.addView(mNewImageReferencePage)
-        rootView.page_layout.addView(mNewVideoReferencePage)
-        rootView.page_layout.addView(mNewAudioReferencePage)
+        mReferenceUiHelper.addPagesToLayout(rootView)
 
-        showView(mShowReferencePage)
+        mReferenceUiHelper.showView(mShowReferencePage)
 
-        setupShowReferencePage()
+        mReferenceUiHelper.setupShowReferencePage()
 
-        mShowReferencePage.expand_btn.setOnClickListener {
-            if (mShowReferencePage.reference_container.visibility == View.VISIBLE) {
-                mShowReferencePage.reference_container.visibility = View.INVISIBLE
-            } else {
-                mShowReferencePage.reference_container.visibility = View.VISIBLE
-            }
-        }
-        mShowReferencePage.reference_title_text.setOnClickListener {
-            if (mShowReferencePage.reference_container.visibility == View.VISIBLE) {
-                mShowReferencePage.reference_container.visibility = View.INVISIBLE
-            } else {
-                mShowReferencePage.reference_container.visibility = View.VISIBLE
-            }
-        }
+        mReferenceUiHelper.setDescriptionVisibilityChangeListener()
 
         rootView.add_new_reference.setOnClickListener {
             it.animateClicks(50) {
-                if (rootView.new_text_reference.visibility == View.VISIBLE) {
-                    rootView.new_text_reference.visibility = View.INVISIBLE
-                    rootView.new_image_reference.visibility = View.INVISIBLE
-                    rootView.new_video_reference.visibility = View.INVISIBLE
-                    rootView.new_audio_reference.visibility = View.INVISIBLE
-                    showView(mShowReferencePage)
-                    rootView.add_new_reference.animateClicksRotation(true, 50)
-                } else {
-                    rootView.new_text_reference.visibility = View.VISIBLE
-                    rootView.new_image_reference.visibility = View.VISIBLE
-                    rootView.new_video_reference.visibility = View.VISIBLE
-                    rootView.new_audio_reference.visibility = View.VISIBLE
-                    showView(mNewWebReferencePage)
-                    rootView.add_new_reference.animateClicksRotation(false, 50)
-                }
+                mReferenceUiHelper.toggleAddNewReferenceUI(rootView)
             }
         }
 
-        rootView.new_text_reference.setOnClickListener {
+        rootView.new_web_reference.setOnClickListener {
             it.animateClicks(50) {
-                showView(mNewWebReferencePage)
+                mReferenceUiHelper.showView(mNewWebReferencePage)
                 mNewWebReferencePage.save_reference_webpage.setOnClickListener { save_button ->
-                    save_button.animateClicks {
-                        if (mNewWebReferencePage.web_reference_link_layout.isNotEmpty()) {
-                            Reference(
-                                mNewWebReferencePage.web_reference_title.text.toString(),
-                                mNewWebReferencePage.web_reference_description.text.toString(),
-                                0f,
-                                Type.URL
-                            ).apply {
-                                onSaveNewReference(this)
-                            }
-                        } else {
-                            mNewWebReferencePage.web_reference_link_layout.requestFocus()
-                            mNewWebReferencePage.web_reference_link_layout.error = "This field is required"
+                    save_button.animateClicks(50) {
+                        mReferenceOnlineHelper.WebReferenceOnlineHelper().saveNewReference(
+                            mNewWebReferencePage,
+                            mReferenceUiHelper.WebReferenceUiHelper()
+                        ){ reference ->
+                            onSaveNewReference(reference)
                         }
                     }
                 }
@@ -136,7 +102,7 @@ class ReferencesFragment : Fragment(), ReaderViewModel.OnReferenceLoadListener {
 
         rootView.new_image_reference.setOnClickListener {
             it.animateClicks(50) {
-                showView(mNewImageReferencePage)
+                mReferenceUiHelper.showView(mNewImageReferencePage)
                 mNewImageReferencePage.select_reference_image.setOnClickListener { choose_image_button ->
                     choose_image_button.animateClicks {
                         val intent = Intent(Intent.ACTION_GET_CONTENT)
@@ -150,10 +116,17 @@ class ReferencesFragment : Fragment(), ReaderViewModel.OnReferenceLoadListener {
 
         rootView.new_video_reference.setOnClickListener {
             it.animateClicks(50) {
-                showView(mNewVideoReferencePage)
+                "Check Point".debugLog()
+                mReferenceUiHelper.showView(mNewVideoReferencePage)
+                mReferenceUiHelper.VideoReferenceUiHelper().setupVideoReferencePage(mNewVideoReferencePage, activity!!)
                 mNewVideoReferencePage.save_reference_video.setOnClickListener { save_button ->
                     save_button.animateClicks {
-
+                        mReferenceOnlineHelper.VideoReferenceOnlineHelper().saveNewReference(
+                            mNewVideoReferencePage,
+                            mReferenceUiHelper.VideoReferenceUiHelper())
+                        {reference ->
+                            onSaveNewReference(reference)
+                        }
                     }
                 }
             }
@@ -161,41 +134,14 @@ class ReferencesFragment : Fragment(), ReaderViewModel.OnReferenceLoadListener {
 
         rootView.new_audio_reference.setOnClickListener {
             it.animateClicks(50) {
-                showView(mNewAudioReferencePage)
-                mNewAudioReferencePage.save_reference_audio.setOnClickListener { save_button ->
+                mReferenceUiHelper.showView(mNewAudioReferencePage)
+                mNewAudioReferencePage.select_reference_audio.setOnClickListener { save_button ->
                     save_button.animateClicks {
-                        showView(mShowReferencePage)
+                        context?.toast("You are not on a paid plan")
                     }
                 }
             }
         }
-    }
-
-    private fun setupShowReferencePage() {
-        mShowReferencePage.reference_recycler.layoutManager =
-            LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        mShowReferencePage.reference_recycler.setHasFixedSize(true)
-        mShowReferencePage.reference_recycler.adapter = ReferenceRecycler()
-        GravitySnapHelper(Gravity.START, true, GravitySnapHelper.SnapListener {
-
-        }).attachToRecyclerView(mShowReferencePage.reference_recycler)
-    }
-
-    private fun showView(view: View?) {
-        mShowReferencePage.visibility = View.INVISIBLE
-        mNewWebReferencePage.visibility = View.INVISIBLE
-        mNewImageReferencePage.visibility = View.INVISIBLE
-        mNewVideoReferencePage.visibility = View.INVISIBLE
-        mNewAudioReferencePage.visibility = View.INVISIBLE
-
-        mShowReferencePage.elevation = 0f
-        mNewWebReferencePage.elevation = 0f
-        mNewImageReferencePage.elevation = 0f
-        mNewVideoReferencePage.elevation = 0f
-        mNewAudioReferencePage.elevation = 0f
-
-        view?.visibility = View.VISIBLE
-        view?.elevation = 3f
     }
 
     override fun onAttach(context: Context) {
@@ -215,12 +161,13 @@ class ReferencesFragment : Fragment(), ReaderViewModel.OnReferenceLoadListener {
         listener = null
     }
 
-    var mMinVal = 0.toLong()
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             REQ_IMG -> {
+                var mMinVal = 0.toLong()
                 if (resultCode == RESULT_OK) {
                     val uri = data?.data
                     if (uri != null) {
@@ -232,35 +179,29 @@ class ReferencesFragment : Fragment(), ReaderViewModel.OnReferenceLoadListener {
                                     .child(generateRandomKey(24))
                                     .apply {
                                         val epiPhantomReference = Reference()
-                                        this.downloadUrl.addOnSuccessListener {
-                                            epiPhantomReference.url = it.toString()
-                                            this.putFile(uri).addOnSuccessListener {
-                                                mNewImageReferencePage.image_reference_upload_progress.visibility =
-                                                    View.INVISIBLE
-                                                epiPhantomReference.type = Type.getMimeType(context!!, uri)
+                                        this.putFile(uri).addOnSuccessListener {
+                                            mNewImageReferencePage.image_reference_upload_progress.visibility =
+                                                View.INVISIBLE
+                                            epiPhantomReference.type = Type.getMimeType(context!!, uri)
+                                            this.downloadUrl.addOnSuccessListener {
+                                                epiPhantomReference.url = it.toString()
                                                 onSaveNewReference(epiPhantomReference)
-                                            }.addOnProgressListener { task ->
-                                                if (mNewImageReferencePage.image_reference_upload_progress.visibility == View.INVISIBLE) {
-                                                    mNewImageReferencePage.image_reference_upload_progress.visibility =
-                                                        View.VISIBLE
-                                                }
-                                                if (mMinVal > task.bytesTransferred && task.bytesTransferred != 0.toLong()) {
-                                                    mMinVal = task.bytesTransferred
-                                                }
+                                            }.addOnFailureListener {
+                                                context?.toast("Failed, Try again")
+                                            }
+                                        }.addOnProgressListener { task ->
+                                            if (mNewImageReferencePage.image_reference_upload_progress.visibility == View.INVISIBLE) {
+                                                mNewImageReferencePage.image_reference_upload_progress.visibility =
+                                                    View.VISIBLE
+                                            }
+                                            if (mMinVal > task.bytesTransferred.debugLog() && task.bytesTransferred != 0.toLong()) {
+                                                mMinVal = task.bytesTransferred
+                                            }
 
-                                                if (task.totalByteCount <= mMinVal) {
-                                                    val tT = (task.totalByteCount - mMinVal) / 100
-                                                    Thread {
-                                                        Thread.sleep(500)
-                                                        val pG = (task.totalByteCount - task.bytesTransferred) / tT
-                                                        mNewImageReferencePage.image_reference_upload_progress.isIndeterminate =
-                                                            false
-                                                        mNewImageReferencePage.image_reference_upload_progress.max = 100
-                                                        mNewImageReferencePage.image_reference_upload_progress.progress =
-                                                            100 - pG.toInt()
-                                                    }
-                                                } else {
-                                                    val tT = (task.totalByteCount - mMinVal) / 100
+                                            if (task.totalByteCount <= mMinVal) {
+                                                val tT = (task.totalByteCount - mMinVal) / 100
+                                                Thread {
+                                                    Thread.sleep(500)
                                                     val pG = (task.totalByteCount - task.bytesTransferred) / tT
                                                     mNewImageReferencePage.image_reference_upload_progress.isIndeterminate =
                                                         false
@@ -268,10 +209,19 @@ class ReferencesFragment : Fragment(), ReaderViewModel.OnReferenceLoadListener {
                                                     mNewImageReferencePage.image_reference_upload_progress.progress =
                                                         100 - pG.toInt()
                                                 }
-                                            }.addOnFailureListener {
-                                                mNewImageReferencePage.image_reference_upload_progress.visibility =
-                                                    View.INVISIBLE
+                                            } else {
+                                                val tT = (task.totalByteCount - mMinVal) / 100
+                                                val pG = (task.totalByteCount - task.bytesTransferred) / tT
+                                                mNewImageReferencePage.image_reference_upload_progress.isIndeterminate =
+                                                    false
+                                                mNewImageReferencePage.image_reference_upload_progress.max = 100
+                                                mNewImageReferencePage.image_reference_upload_progress.progress =
+                                                    100 - pG.toInt()
                                             }
+                                        }.addOnFailureListener {
+                                            mNewImageReferencePage.image_reference_upload_progress.visibility =
+                                                View.INVISIBLE
+                                            context?.toast("Failed, Try again")
                                         }
                                     }
                             }
@@ -329,7 +279,80 @@ class ReferencesFragment : Fragment(), ReaderViewModel.OnReferenceLoadListener {
         }
 
         override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+            when(referenceList[position].second.type) {
+                in arrayOf(Type.URL) -> {
+                    Thread{
+                        sleep(500)
+                        activity!!.runOnUiThread {
+                            holder.itemView.reference_webview.settings.javaScriptEnabled = true
+                            val webViewClient = object: WebViewClient(){
 
+                                override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                                    holder.itemView.page_load_progress.visibility = View.VISIBLE
+                                    super.onPageStarted(view, url, favicon)
+                                }
+
+                                override fun onPageFinished(view: WebView?, url: String?) {
+                                    holder.itemView.page_load_progress.visibility = View.INVISIBLE
+                                    super.onPageFinished(view, url)
+                                }
+
+                                override fun onReceivedError(
+                                    view: WebView?,
+                                    request: WebResourceRequest?,
+                                    error: WebResourceError?
+                                ) {
+                                    context!!.toast("Failed to load web page at ${referenceList[position].second.url}")
+                                    super.onReceivedError(view, request, error)
+                                }
+                            }
+                            holder.itemView.reference_webview.webViewClient = webViewClient
+                            holder.itemView.reference_webview.loadUrl(referenceList[position].second.url)
+                        }
+                    }.start()
+
+                    holder.itemView.reference_link_text.text = referenceList[position].second.url
+                    mShowReferencePage.reference_title_text.text = referenceList[position].second.title ?: ""
+                    mShowReferencePage.reference_notes_text.text = referenceList[position].second.notes ?: ""
+                }
+
+                in arrayOf(Type.BMP, Type.JPEG, Type.GIF, Type.JPG, Type.PNG, Type.WBMP, Type.WEBP) -> {
+                    mReferenceUiHelper.ImageReferenceUiHelper().showReferenceRecyclerBindAction(
+                        this@ReferencesFragment, this@ReferenceRecycler, position, holder
+                    )
+                }
+
+                in arrayOf(Type.AAC, Type.MP3, Type.MWA) -> {
+                    mShowReferencePage.reference_title_text.text = referenceList[position].second.title ?: ""
+                    mShowReferencePage.reference_notes_text.text = referenceList[position].second.notes ?: ""
+                }
+
+                in arrayOf(Type.MKV, Type.MP4, Type.YOUTUBE) -> {
+
+                    holder.itemView.videoView.setOnClickListener {
+                        holder.itemView.videoView.setVideoURI(Uri.parse(referenceList[position].second.url), HashMap<String, String>())
+
+                        MediaController(activity).apply {
+                            setAnchorView(holder.itemView.videoView)
+                            holder.itemView.videoView.setMediaController(this)
+                        }
+                        if(holder.itemView.videoView.isPlaying){
+                            holder.itemView.videoView.pause()
+                            holder.itemView.play_image.visibility = View.VISIBLE
+                        }else{
+                            holder.itemView.videoView.start()
+                            holder.itemView.play_image.visibility = View.INVISIBLE
+                        }
+                    }
+
+                    mShowReferencePage.reference_title_text.text = referenceList[position].second.title ?: ""
+                    mShowReferencePage.reference_notes_text.text = referenceList[position].second.notes ?: ""
+                }
+
+                else ->{
+                    "Unsupported".debugLog()
+                }
+            }
         }
 
         override fun getItemViewType(position: Int): Int {
@@ -361,10 +384,15 @@ class ReferencesFragment : Fragment(), ReaderViewModel.OnReferenceLoadListener {
         fun onReferenceFragmentInit(fragment: ReferencesFragment)
     }
 
+    /**
+     * Called when the pdfView is swiped to a new page
+     * */
     override fun onCurrentPageChangeReference(pageId: Int) {
         mShowReferencePage.reference_recycler.adapter = ReferenceRecycler(mViewModel.getPageReferences(pageId))
         GravitySnapHelper(Gravity.START, true, GravitySnapHelper.SnapListener {
-
+            val currentReference = (mShowReferencePage.reference_recycler.adapter as ReferenceRecycler).referenceList[it].second
+            mShowReferencePage.reference_title_text.text = currentReference.title ?: ""
+            mShowReferencePage.reference_notes_text.text = currentReference.notes ?: ""
         }).attachToRecyclerView(mShowReferencePage.reference_recycler)
     }
 
@@ -372,9 +400,12 @@ class ReferencesFragment : Fragment(), ReaderViewModel.OnReferenceLoadListener {
         mReferenceLoadListener?.onSaveNewReference(reference)
     }
 
+    /**
+     * Called when the reference list of the current page is changed
+     * */
     override fun onPageReferencesChanged() {
-        showView(mShowReferencePage)
-        mShowReferencePage.reference_recycler.adapter = ReferenceRecycler()
+        mReferenceUiHelper.showView(mShowReferencePage)
+        mShowReferencePage.reference_recycler.adapter = ReferenceRecycler(mViewModel.getPageReferences(mViewModel.mCurrentPageNumber))
     }
 
     companion object {

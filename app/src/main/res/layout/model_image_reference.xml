@@ -25,7 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:adjustViewBounds="true"
-            android:background="@drawable/banner_blue_flame_black_background_edit"
-            android:scaleType="fitCenter" />
+            android:scaleType="fitCenter"
+             />
     </com.google.android.material.card.MaterialCardView>
 </androidx.constraintlayout.widget.ConstraintLayout>
